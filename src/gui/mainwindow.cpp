@@ -9,6 +9,8 @@
 #include <QInputDialog>
 
 #include <log.hpp>
+#include <Config.hpp>
+#include <ConfigLabels.hpp>
 
 
 MainWindow::MainWindow(QWidget* parent)
@@ -85,7 +87,12 @@ void MainWindow::handleDock(QWidget* component, QMdiArea* mdi)
 
 void MainWindow::showEvent(QShowEvent* event [[gnu::unused]])
 {
-    emit requestAvailableDevices("socketcan"); // FIXME: plugin name should be configurable
+    std::string devName = Config::get<std::string>(config::general::candevice, "");
+
+    if (devName.empty())
+        emit requestAvailableDevices("socketcan"); // FIXME: plugin name should be configurable
+    else
+        emit selectCANDevice("socketcan", devName.c_str());
 }
 
 #if QT_VERSION >= QT_VERSION_CHECK(5, 9, 1)
@@ -108,6 +115,7 @@ void MainWindow::availableDevices(QString backend,
                                          tr("Available CAN devices on %1 backend").arg(backend),
                                          items, 0, false, &ok);
 
+    Config::put(config::general::candevice, item.toStdString());
     emit selectCANDevice(backend, item);
 }
 #else
@@ -116,6 +124,7 @@ void MainWindow::availableDevices(QString backend)
     QString item = QInputDialog::getText(this, tr("Provide CAN device name"),
             tr("Please input below the name of CAN device to use"));
 
+    Config::put(config::general::candevice, item.toStdString());
     emit selectCANDevice(backend, item);
 }
 #endif

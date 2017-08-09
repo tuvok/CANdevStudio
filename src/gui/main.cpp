@@ -3,8 +3,9 @@
 #include <QtCore/QtGlobal>
 #include <QtWidgets/QApplication>
 
-#include "log.hpp"
-#include "CanDeviceManager.hpp"
+#include <log.hpp>
+#include <CanDeviceManager.hpp>
+#include <Config.hpp>
 
 std::shared_ptr<spdlog::logger> kDefaultLogger;
 std::shared_ptr<spdlog::logger> qtDefaultLogger;
@@ -58,8 +59,9 @@ int main(int argc, char* argv[])
     setupLogger(CDS_DEBUG);
 
     cds_debug("Staring CANdevStudio");
-
     qDebug() << "Qt message ";
+
+    Config::init();
 
     CanDeviceManager m;
     MainWindow w;
